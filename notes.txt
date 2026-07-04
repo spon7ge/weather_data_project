@@ -1,0 +1,15 @@
+Open-Meteo API
+      ↓
+Python extracts data
+      ↓
+Store raw JSON
+      ↓
+Load into PostgreSQL
+      ↓
+Transform with dbt
+      ↓
+Schedule with Airflow
+      ↓
+Visualize in Power BI/Tableau
+      ↓
+Version control with GitHub (throughout)
