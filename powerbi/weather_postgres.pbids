@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "connections": [
+    {
+      "details": {
+        "protocol": "postgresql",
+        "address": {
+          "server": "localhost",
+          "database": "weather_db"
+        },
+        "authentication": null,
+        "query": null,
+        "options": {
+          "commandTimeout": 0,
+          "connectionTimeout": 0
+        },
+        "sslmode": null
+      },
+      "mode": "Import",
+      "options": {},
+      "name": "weather_db"
+    }
+  ]
+}
