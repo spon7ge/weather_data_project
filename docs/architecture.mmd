@@ -1,0 +1,34 @@
+flowchart LR
+    subgraph ingest["Ingestion"]
+        API["Open-Meteo API"]
+        PY["extract.py"]
+        JSON["raw/*.json"]
+    end
+
+    subgraph store["Storage"]
+        PG[("PostgreSQL")]
+        RAW["raw.open_meteo_forecast"]
+    end
+
+    subgraph transform["dbt"]
+        STG["staging views"]
+        INT["intermediate views"]
+        MART["analytics marts"]
+    end
+
+    subgraph orchestrate["Orchestration"]
+        AF["Airflow DAG"]
+    end
+
+    subgraph viz["Visualization"]
+        PBI["Power BI / dashboard"]
+    end
+
+    API --> PY
+    PY --> JSON
+    PY --> RAW
+    RAW --> PG
+    PG --> STG --> INT --> MART
+    AF --> PY
+    AF --> MART
+    MART --> PBI

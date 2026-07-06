@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
+  <rect width="960" height="420" fill="#f5f6f8"/>
+  <rect x="40" y="40" width="880" height="340" rx="8" fill="#fff" stroke="#ccc"/>
+  <text x="480" y="160" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" fill="#333">dbt lineage graph</text>
+  <text x="480" y="200" text-anchor="middle" font-family="system-ui,sans-serif" font-size="15" fill="#666">Replace with screenshot from dbt docs</text>
+  <rect x="120" y="240" width="160" height="40" rx="4" fill="#694" opacity=".9"/><text x="200" y="265" text-anchor="middle" font-family="system-ui" font-size="12" fill="#fff">open_meteo_forecast</text>
+  <rect x="320" y="240" width="160" height="40" rx="4" fill="#47a"/><text x="400" y="265" text-anchor="middle" font-family="system-ui" font-size="12" fill="#fff">stg_open_meteo__hourly</text>
+  <rect x="520" y="240" width="160" height="40" rx="4" fill="#47a"/><text x="600" y="265" text-anchor="middle" font-family="system-ui" font-size="12" fill="#fff">int_weather__hourly</text>
+  <rect x="720" y="240" width="160" height="40" rx="4" fill="#c55"/><text x="800" y="265" text-anchor="middle" font-family="system-ui" font-size="12" fill="#fff">fct_hourly_weather</text>
+  <line x1="280" y1="260" x2="320" y2="260" stroke="#888" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="480" y1="260" x2="520" y2="260" stroke="#888" stroke-width="2"/>
+  <line x1="680" y1="260" x2="720" y2="260" stroke="#888" stroke-width="2"/>
+</svg>

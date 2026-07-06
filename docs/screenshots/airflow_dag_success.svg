@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
+  <rect width="960" height="420" fill="#f5f6f8"/>
+  <rect x="40" y="40" width="880" height="340" rx="8" fill="#fff" stroke="#ccc"/>
+  <text x="480" y="180" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" fill="#333">Airflow  weather_pipeline DAG</text>
+  <text x="480" y="220" text-anchor="middle" font-family="system-ui,sans-serif" font-size="15" fill="#666">Replace with screenshot: all tasks green</text>
+  <rect x="120" y="260" width="140" height="48" rx="4" fill="#2ecc71"/><text x="190" y="290" text-anchor="middle" font-family="system-ui" font-size="13" fill="#fff">extract</text>
+  <rect x="300" y="260" width="140" height="48" rx="4" fill="#2ecc71"/><text x="370" y="290" text-anchor="middle" font-family="system-ui" font-size="13" fill="#fff">load_check</text>
+  <rect x="480" y="260" width="140" height="48" rx="4" fill="#2ecc71"/><text x="550" y="290" text-anchor="middle" font-family="system-ui" font-size="13" fill="#fff">dbt_run</text>
+  <rect x="660" y="260" width="140" height="48" rx="4" fill="#2ecc71"/><text x="730" y="290" text-anchor="middle" font-family="system-ui" font-size="13" fill="#fff">dbt_test</text>
+</svg>
