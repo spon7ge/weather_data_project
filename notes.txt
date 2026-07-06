@@ -13,3 +13,39 @@ Schedule with Airflow
 Visualize in Power BI/Tableau
       ↓
 Version control with GitHub (throughout)
+
+weather_dbt/
+├── dbt_project.yml          # schema routing: staging / intermediate / analytics
+├── packages.yml             # dbt-labs/dbt_utils 1.4.1
+├── profiles.yml             # reads POSTGRES_* env vars, defaults to docker-compose values
+├── macros/
+│   └── generate_schema_name.sql   # makes staging→staging, not analytics_staging
+├── seeds/
+│   ├── locations.csv        # 7-row reference table (name, lat, lon, state, city)
+│   └── _seeds.yml
+└── models/
+    ├── staging/             → materialized as VIEWs in staging schema
+    │   ├── stg_open_meteo__hourly.sql   (generate_series + JSONB array indexing)
+    │   └── stg_open_meteo__daily.sql
+    ├── intermediate/        → materialized as VIEWs in intermediate schema
+    │   ├── int_weather__hourly_enriched.sql  (dedup, location join, rolling avg)
+    │   └── int_weather__daily_enriched.sql   (dedup, location join, derived fields)
+    └── marts/               → materialized as TABLEs in analytics schema
+        ├── fct_hourly_weather.sql       (1,176 rows — 7 locations × 168 hours)
+        ├── fct_daily_weather.sql        (49 rows  — 7 locations × 7 days)
+        ├── daily_temperature_summary.sql (7 rows  — one per forecast date)
+        └── temperature_anomalies.sql    (49 rows  — anomaly delta + category per loc/day)
+
+
+HOW TO RUN/ RE-RUN
+# 1. Start weather Postgres (if not already running)
+docker compose up -d
+
+# 2. Start Airflow (first time: build + init)
+cd airflow
+docker compose build
+docker compose up airflow-init   # first time only
+docker compose up -d
+
+# 3. Trigger a run manually
+docker compose exec airflow-scheduler airflow dags trigger weather_pipeline

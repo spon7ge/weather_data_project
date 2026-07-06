@@ -1,8 +1,14 @@
+networks:
+  weather_net:
+    name: weather_net
+
 services:
   postgres:
     image: postgres:16-alpine
     container_name: weather_postgres
     restart: unless-stopped
+    networks:
+      - weather_net
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     environment:
