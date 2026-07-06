@@ -1,0 +1,160 @@
+version: 2
+
+models:
+  - name: fct_hourly_weather
+    description: >
+      Hourly weather fact table. Grain: one row per (location_name, observation_hour).
+      Materialized as a table for query performance. Contains a surrogate key, all
+      enriched fields from the intermediate layer, and Celsius temperature.
+    columns:
+      - name: hourly_weather_sk
+        description: "Surrogate key: MD5 of (location_name, observation_hour)."
+        tests:
+          - not_null
+          - unique
+      - name: location_name
+        tests:
+          - not_null
+      - name: observation_hour
+        tests:
+          - not_null
+      - name: temperature_2m_f
+        description: "Air temperature degrees Fahrenheit."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -40
+              max_value: 135
+      - name: temperature_2m_c
+        description: "Air temperature degrees Celsius."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: -40
+              max_value: 57
+      - name: relative_humidity_pct
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: cloud_cover_pct
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: wind_speed_mph
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 250
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - location_name
+            - observation_hour
+
+  - name: fct_daily_weather
+    description: >
+      Daily weather fact table. Grain: one row per (location_name, forecast_date).
+      Materialized as a table. Includes derived fields: avg temp, temp range,
+      daylight/sunshine hours, sunshine percentage.
+    columns:
+      - name: daily_weather_sk
+        description: "Surrogate key: MD5 of (location_name, forecast_date)."
+        tests:
+          - not_null
+          - unique
+      - name: location_name
+        tests:
+          - not_null
+      - name: forecast_date
+        tests:
+          - not_null
+      - name: temperature_max_f
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -40
+              max_value: 135
+      - name: temperature_min_f
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -40
+              max_value: 135
+      - name: temperature_avg_f
+        tests:
+          - not_null
+      - name: temperature_range_f
+        description: "Daily temperature swing (max − min). Should always be ≥ 0."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 80
+      - name: uv_index_max
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 20
+      - name: precipitation_sum_in
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 50
+      - name: sunshine_pct
+        description: "Percentage of daylight hours with sunshine (0–100)."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - location_name
+            - forecast_date
+
+  - name: daily_temperature_summary
+    description: >
+      Cross-location daily summary. Grain: one row per forecast_date.
+      Aggregates temperature, precipitation, wind, and UV across all locations,
+      and identifies the hottest and coldest city for each day.
+    columns:
+      - name: forecast_date
+        tests:
+          - not_null
+          - unique
+      - name: location_count
+        description: "Number of distinct locations contributing to this row."
+        tests:
+          - not_null
+      - name: avg_temp_f
+        tests:
+          - not_null
+
+  - name: temperature_anomalies
+    description: >
+      Per-location, per-day temperature anomaly relative to the cross-location
+      average for that date. A positive avg_temp_anomaly_f means the city was
+      warmer than the group average. Includes a categorical label (much_warmer,
+      warmer, near_average, cooler, much_cooler) with ±2°F / ±5°F thresholds.
+    columns:
+      - name: location_name
+        tests:
+          - not_null
+      - name: forecast_date
+        tests:
+          - not_null
+      - name: temperature_anomaly_category
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - much_warmer
+                - warmer
+                - near_average
+                - cooler
+                - much_cooler
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - location_name
+            - forecast_date

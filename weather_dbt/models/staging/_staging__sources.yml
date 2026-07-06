@@ -1,0 +1,36 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Landing zone tables written by the Python extraction script (extract.py)."
+    database: weather_db
+    schema: raw
+    tables:
+      - name: open_meteo_forecast
+        description: >
+          One row per Open-Meteo API call. The response_body column holds the full,
+          unmodified JSON returned by the API, including nested hourly and daily arrays.
+        columns:
+          - name: forecast_id
+            description: "Auto-incrementing surrogate PK."
+            tests:
+              - not_null
+              - unique
+          - name: ingested_at
+            description: "UTC wall-clock time the row was inserted."
+            tests:
+              - not_null
+          - name: latitude
+            tests:
+              - not_null
+          - name: longitude
+            tests:
+              - not_null
+          - name: response_body
+            description: "Full Open-Meteo JSON response stored as JSONB."
+            tests:
+              - not_null
+          - name: request_params
+            description: "Query parameters sent to the API, stored as JSONB."
+            tests:
+              - not_null

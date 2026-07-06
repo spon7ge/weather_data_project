@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: int_weather__hourly_enriched
+    description: >
+      Hourly weather enriched with location metadata and derived fields.
+      Deduplicates on (latitude, longitude, observation_hour), keeping the
+      most recently ingested forecast. Adds Celsius conversion and a 3-hour
+      rolling average temperature per location.
+    columns:
+      - name: location_name
+        description: "City slug from the locations seed, e.g. los_angeles."
+        tests:
+          - not_null
+      - name: observation_hour
+        description: "Local timestamp of the forecast hour."
+        tests:
+          - not_null
+      - name: temperature_2m_f
+        tests:
+          - not_null
+      - name: temperature_2m_c
+        description: "Temperature converted to Celsius: (°F - 32) × 5/9."
+      - name: temp_3hr_rolling_avg_f
+        description: "Rolling 3-hour average temperature per location (rows between 2 preceding and current)."
+      - name: is_weekend
+        description: "True if observation_hour falls on Saturday or Sunday."
+
+  - name: int_weather__daily_enriched
+    description: >
+      Daily weather enriched with location metadata and derived fields.
+      Deduplicates on (latitude, longitude, forecast_date), keeping the
+      most recently ingested forecast. Adds temperature range, average,
+      and daylight/sunshine hours.
+    columns:
+      - name: location_name
+        tests:
+          - not_null
+      - name: forecast_date
+        tests:
+          - not_null
+      - name: temperature_max_f
+        tests:
+          - not_null
+      - name: temperature_min_f
+        tests:
+          - not_null
+      - name: temperature_avg_f
+        description: "Simple average of daily high and low: (max + min) / 2."
+      - name: temperature_range_f
+        description: "Daily temperature swing: max − min."
+      - name: daylight_hours
+        description: "Total daylight duration in hours (converted from seconds)."
+      - name: sunshine_hours
+        description: "Total sunshine duration in hours (converted from seconds)."
+      - name: sunshine_pct
+        description: "Sunshine hours as a percentage of daylight hours."

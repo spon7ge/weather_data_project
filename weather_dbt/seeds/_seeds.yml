@@ -1,0 +1,20 @@
+version: 2
+
+seeds:
+  - name: locations
+    description: "Reference table mapping lat/lon coordinates to human-readable city names."
+    columns:
+      - name: location_name
+        description: "Unique slug for the location, e.g. los_angeles."
+        tests:
+          - not_null
+          - unique
+      - name: latitude
+        tests:
+          - not_null
+      - name: longitude
+        tests:
+          - not_null
+      - name: state
+        tests:
+          - not_null

@@ -1,0 +1,126 @@
+version: 2
+
+models:
+  - name: stg_open_meteo__hourly
+    description: >
+      Hourly weather readings unnested from raw JSONB.
+      Grain: one row per (forecast_id, hour_index).
+      Types are cast; field names are renamed for clarity.
+      No deduplication — that happens in the intermediate layer.
+    columns:
+      - name: forecast_id
+        description: "FK to raw.open_meteo_forecast."
+        tests:
+          - not_null
+      - name: observation_hour
+        description: "Local timestamp of the forecast hour (no timezone stored; tz in timezone column)."
+        tests:
+          - not_null
+      - name: hour_index
+        description: "0-based position of this hour in the API response array."
+        tests:
+          - not_null
+      - name: latitude
+        tests:
+          - not_null
+      - name: longitude
+        tests:
+          - not_null
+      - name: temperature_2m_f
+        description: "Air temperature 2 m above ground, degrees Fahrenheit."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -40
+              max_value: 135
+      - name: relative_humidity_pct
+        description: "Relative humidity percentage."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: precipitation_probability_pct
+        description: "Probability of precipitation, 0–100."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: cloud_cover_pct
+        description: "Total cloud cover percentage."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: wind_speed_mph
+        description: "Wind speed 10 m above ground, miles per hour."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 250
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - forecast_id
+            - hour_index
+
+  - name: stg_open_meteo__daily
+    description: >
+      Daily weather summaries unnested from raw JSONB.
+      Grain: one row per (forecast_id, day_index).
+      No deduplication — that happens in the intermediate layer.
+    columns:
+      - name: forecast_id
+        description: "FK to raw.open_meteo_forecast."
+        tests:
+          - not_null
+      - name: forecast_date
+        description: "Calendar date the daily summary covers."
+        tests:
+          - not_null
+      - name: day_index
+        description: "0-based position of this day in the API response array."
+        tests:
+          - not_null
+      - name: latitude
+        tests:
+          - not_null
+      - name: longitude
+        tests:
+          - not_null
+      - name: temperature_max_f
+        description: "Daily high temperature, degrees Fahrenheit."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -40
+              max_value: 135
+      - name: temperature_min_f
+        description: "Daily low temperature, degrees Fahrenheit."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -40
+              max_value: 135
+      - name: uv_index_max
+        description: "Peak UV index for the day."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 20
+      - name: precipitation_sum_in
+        description: "Total precipitation, inches."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 50
+      - name: precipitation_probability_max_pct
+        description: "Maximum hourly precipitation probability for the day."
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - forecast_id
+            - day_index
